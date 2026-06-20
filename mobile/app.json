@@ -1,0 +1,56 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/ingredients/ingredients",
+    "pages/stock/stock",
+    "pages/trace/trace",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#1d1d1f",
+    "navigationBarTitleText": "食材管理平台",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f7"
+  },
+  "tabBar": {
+    "color": "#86868b",
+    "selectedColor": "#0a84ff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/images/home.png",
+        "selectedIconPath": "static/images/home-active.png"
+      },
+      {
+        "pagePath": "pages/ingredients/ingredients",
+        "text": "食材",
+        "iconPath": "static/images/ingredients.png",
+        "selectedIconPath": "static/images/ingredients-active.png"
+      },
+      {
+        "pagePath": "pages/stock/stock",
+        "text": "出入库",
+        "iconPath": "static/images/stock.png",
+        "selectedIconPath": "static/images/stock-active.png"
+      },
+      {
+        "pagePath": "pages/trace/trace",
+        "text": "追溯",
+        "iconPath": "static/images/trace.png",
+        "selectedIconPath": "static/images/trace-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "static/images/profile.png",
+        "selectedIconPath": "static/images/profile-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

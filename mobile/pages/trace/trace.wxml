@@ -1,0 +1,101 @@
+<view class="container">
+  <!-- 搜索区域 -->
+  <view class="search-section">
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="输入追溯码查询..." value="{{searchCode}}" bindinput="onSearchInput" confirm-type="search" bindconfirm="doSearch" />
+      <view class="search-btn" bindtap="doSearch">查询</view>
+    </view>
+    <view class="scan-btn" bindtap="scanCode">
+      <text class="scan-icon">📷</text>
+      <text class="scan-text">扫码追溯</text>
+    </view>
+  </view>
+
+  <!-- 追溯结果 -->
+  <view class="result-card" wx:if="{{traceResult}}">
+    <view class="result-header">
+      <view class="result-code">{{traceResult.trace_code}}</view>
+      <view class="tag {{traceResult.status === 'active' ? 'tag-green' : 'tag-gray'}}">
+        {{traceResult.status === 'active' ? '有效' : '已失效'}}
+      </view>
+    </view>
+
+    <!-- 时间线 -->
+    <view class="timeline">
+      <view class="timeline-item {{traceResult.step >= 1 ? 'active' : ''}}">
+        <view class="timeline-dot">✓</view>
+        <view class="timeline-content">
+          <view class="timeline-title">采购入库</view>
+          <view class="timeline-time">{{traceResult.stock_in_date}}</view>
+        </view>
+      </view>
+      <view class="timeline-line {{traceResult.step >= 2 ? 'active' : ''}}"></view>
+      <view class="timeline-item {{traceResult.step >= 2 ? 'active' : ''}}">
+        <view class="timeline-dot">✓</view>
+        <view class="timeline-content">
+          <view class="timeline-title">质检审核</view>
+          <view class="timeline-time">{{traceResult.inspector}}</view>
+        </view>
+      </view>
+      <view class="timeline-line {{traceResult.step >= 3 ? 'active' : ''}}"></view>
+      <view class="timeline-item {{traceResult.step >= 3 ? 'active' : ''}}">
+        <view class="timeline-dot">✓</view>
+        <view class="timeline-content">
+          <view class="timeline-title">库存管理</view>
+          <view class="timeline-time">{{traceResult.storage_location}}</view>
+        </view>
+      </view>
+      <view class="timeline-line {{traceResult.step >= 4 ? 'active' : ''}}"></view>
+      <view class="timeline-item {{traceResult.step >= 4 ? 'active' : ''}}">
+        <view class="timeline-dot">{{traceResult.step >= 4 ? '✓' : '○'}}</view>
+        <view class="timeline-content">
+          <view class="timeline-title">出库使用</view>
+          <view class="timeline-time">{{traceResult.stock_out_date || '待出库'}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 详细信息 -->
+    <view class="detail-section">
+      <view class="detail-row">
+        <text class="detail-label">食材</text>
+        <text class="detail-value">{{traceResult.ingredient_name}}</text>
+      </view>
+      <view class="detail-row">
+        <text class="detail-label">供应商</text>
+        <text class="detail-value">{{traceResult.supplier_name}}</text>
+      </view>
+      <view class="detail-row">
+        <text class="detail-label">入库数量</text>
+        <text class="detail-value">{{traceResult.quantity}} {{traceResult.unit}}</text>
+      </view>
+      <view class="detail-row">
+        <text class="detail-label">生产日期</text>
+        <text class="detail-value">{{traceResult.production_date}}</text>
+      </view>
+      <view class="detail-row">
+        <text class="detail-label">保质期至</text>
+        <text class="detail-value">{{traceResult.expiry_date}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最近记录 -->
+  <view class="card">
+    <view class="card-title">最近追溯记录</view>
+    <view class="trace-list">
+      <view class="trace-item" wx:for="{{traceList}}" wx:key="trace_code" bindtap="quickSearch" data-code="{{item.trace_code}}">
+        <view class="trace-left">
+          <view class="trace-code">{{item.trace_code}}</view>
+          <view class="trace-desc">{{item.ingredient_name}} · {{item.supplier_name}}</view>
+        </view>
+        <view class="trace-right">
+          <view class="tag {{item.status === 'active' ? 'tag-green' : 'tag-gray'}}">
+            {{item.status === 'active' ? '有效' : '已消耗'}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

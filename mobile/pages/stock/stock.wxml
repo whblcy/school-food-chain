@@ -1,0 +1,130 @@
+<view class="container">
+  <!-- Tab切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'in' ? 'active' : ''}}" bindtap="switchTab" data-tab="in">
+      <text class="tab-icon">📥</text>
+      <text class="tab-text">入库</text>
+    </view>
+    <view class="tab-item {{activeTab === 'out' ? 'active' : ''}}" bindtap="switchTab" data-tab="out">
+      <text class="tab-icon">📤</text>
+      <text class="tab-text">出库</text>
+    </view>
+  </view>
+
+  <!-- 入库表单 -->
+  <view class="form-card" wx:if="{{activeTab === 'in'}}">
+    <view class="form-group">
+      <view class="form-label">食材 *</view>
+      <picker mode="selector" range="{{ingredientOptions}}" range-key="name" bindchange="onIngredientChange">
+        <view class="picker-value {{selectedIngredient ? '' : 'placeholder'}}">
+          {{selectedIngredient ? selectedIngredient.name : '请选择食材'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">数量 *</view>
+      <input class="input" type="digit" placeholder="请输入数量" value="{{inForm.quantity}}" bindinput="onInQuantity" />
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">单价 (¥) *</view>
+      <input class="input" type="digit" placeholder="请输入单价" value="{{inForm.unit_price}}" bindinput="onInPrice" />
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">生产日期</view>
+      <picker mode="date" value="{{inForm.production_date}}" bindchange="onProductionDate">
+        <view class="picker-value">{{inForm.production_date}}</view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">保质期至</view>
+      <picker mode="date" value="{{inForm.expiry_date}}" bindchange="onExpiryDate">
+        <view class="picker-value">{{inForm.expiry_date}}</view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">验收人1 *</view>
+      <picker mode="selector" range="{{userOptions}}" range-key="name" bindchange="onInspector1Change">
+        <view class="picker-value {{inForm.inspector1_id ? '' : 'placeholder'}}">
+          {{inForm.inspector1_name || '请选择验收人'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">验收人2 *</view>
+      <picker mode="selector" range="{{userOptions}}" range-key="name" bindchange="onInspector2Change">
+        <view class="picker-value {{inForm.inspector2_id ? '' : 'placeholder'}}">
+          {{inForm.inspector2_name || '请选择验收人'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">备注</view>
+      <input class="input" placeholder="可选" value="{{inForm.remark}}" bindinput="onInRemark" />
+    </view>
+
+    <button class="btn-primary" loading="{{submitting}}" bindtap="submitStockIn">确认入库</button>
+  </view>
+
+  <!-- 出库表单 -->
+  <view class="form-card" wx:if="{{activeTab === 'out'}}">
+    <view class="form-group">
+      <view class="form-label">食材 *</view>
+      <picker mode="selector" range="{{ingredientOptions}}" range-key="name" bindchange="onOutIngredientChange">
+        <view class="picker-value {{outForm.ingredient_id ? '' : 'placeholder'}}">
+          {{outForm.ingredient_name || '请选择食材'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group" wx:if="{{outForm.ingredient_id}}">
+      <view class="stock-hint">当前库存: <text class="stock-value">{{outForm.current_stock}}</text> {{outForm.unit}}</view>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">数量 *</view>
+      <input class="input" type="digit" placeholder="请输入数量" value="{{outForm.quantity}}" bindinput="onOutQuantity" />
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">用途</view>
+      <input class="input" placeholder="如：午餐加工" value="{{outForm.purpose}}" bindinput="onOutPurpose" />
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">部门</view>
+      <input class="input" placeholder="使用部门" value="{{outForm.department}}" bindinput="onOutDepartment" />
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">备注</view>
+      <input class="input" placeholder="可选" value="{{outForm.remark}}" bindinput="onOutRemark" />
+    </view>
+
+    <button class="btn-primary" loading="{{submitting}}" bindtap="submitStockOut">确认出库</button>
+  </view>
+
+  <!-- 最近记录 -->
+  <view class="card">
+    <view class="card-title">{{activeTab === 'in' ? '最近入库' : '最近出库'}}</view>
+    <view class="record-list">
+      <view class="record-item" wx:for="{{records}}" wx:key="id">
+        <view class="record-left">
+          <view class="record-name">{{item.ingredient_name}}</view>
+          <view class="record-desc">{{item.created_at}}</view>
+        </view>
+        <view class="record-right">
+          <view class="record-amount {{activeTab === 'in' ? 'text-green' : 'text-red'}}">
+            {{activeTab === 'in' ? '+' : '-'}}{{item.quantity}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,194 @@
+.search-section {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.search-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+}
+
+.search-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.search-btn {
+  background-color: #0a84ff;
+  color: #ffffff;
+  font-size: 26rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 12rpx;
+  margin-left: 12rpx;
+}
+
+.scan-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  min-width: 120rpx;
+}
+
+.scan-icon {
+  font-size: 40rpx;
+  margin-bottom: 4rpx;
+}
+
+.scan-text {
+  font-size: 22rpx;
+  color: #0a84ff;
+}
+
+/* 结果卡片 */
+.result-card {
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.result-code {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+/* 时间线 */
+.timeline {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32rpx;
+  padding: 20rpx 0;
+}
+
+.timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.timeline-item.active .timeline-dot {
+  background-color: #30d158;
+  color: #ffffff;
+}
+
+.timeline-item.active .timeline-title {
+  color: #1d1d1f;
+}
+
+.timeline-dot {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background-color: #e5e5ea;
+  color: #86868b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  margin-bottom: 12rpx;
+}
+
+.timeline-content {
+  text-align: center;
+}
+
+.timeline-title {
+  font-size: 24rpx;
+  color: #86868b;
+  margin-bottom: 4rpx;
+}
+
+.timeline-time {
+  font-size: 20rpx;
+  color: #c7c7cc;
+}
+
+.timeline-line {
+  width: 40rpx;
+  height: 4rpx;
+  background-color: #e5e5ea;
+  margin-bottom: 40rpx;
+}
+
+.timeline-line.active {
+  background-color: #30d158;
+}
+
+/* 详情 */
+.detail-section {
+  border-top: 2rpx solid #f5f5f7;
+  padding-top: 24rpx;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16rpx 0;
+}
+
+.detail-label {
+  font-size: 26rpx;
+  color: #86868b;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+/* 追溯列表 */
+.trace-list {
+  margin-top: -8rpx;
+}
+
+.trace-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid #f5f5f7;
+}
+
+.trace-item:last-child {
+  border-bottom: none;
+}
+
+.trace-item:active {
+  background-color: #f5f5f7;
+}
+
+.trace-code {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #0a84ff;
+  margin-bottom: 4rpx;
+}
+
+.trace-desc {
+  font-size: 24rpx;
+  color: #86868b;
+}
