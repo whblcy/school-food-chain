@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import engine, Base
-from app.routers import auth, users, orgs, suppliers, ingredients, stock, finance, reports, trace, audit
+from app.routers import auth, users, orgs, suppliers, ingredients, stock, finance, reports, trace, audit, gov
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -37,6 +37,7 @@ app.include_router(finance.router, prefix="/api/v1/finance", tags=["财务"])
 app.include_router(reports.router, prefix="/api/v1/reports", tags=["报表"])
 app.include_router(trace.router, prefix="/api/v1/trace", tags=["追溯"])
 app.include_router(audit.router, prefix="/api/v1/audit", tags=["审计"])
+app.include_router(gov.router, prefix="/api/v1/gov", tags=["教育局监管"])
 
 
 @app.get("/health")

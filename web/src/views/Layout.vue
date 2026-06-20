@@ -57,6 +57,11 @@
           <el-icon><User /></el-icon>
           <span>用户管理</span>
         </el-menu-item>
+
+        <el-menu-item index="/gov">
+          <el-icon><Monitor /></el-icon>
+          <span>教育局监管</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     
@@ -89,7 +94,7 @@
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
-import { Food, DataLine, Goods, Download, Upload, Check, OfficeBuilding, Money, Search, User } from '@element-plus/icons-vue'
+import { DataLine, Goods, Download, Upload, Check, OfficeBuilding, Money, Search, User, Monitor } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

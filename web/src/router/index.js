@@ -66,6 +66,12 @@ const routes = [
         name: 'Users',
         component: () => import('../views/Users.vue'),
         meta: { title: '用户管理' }
+      },
+      {
+        path: 'gov',
+        name: 'GovDashboard',
+        component: () => import('../views/GovDashboard.vue'),
+        meta: { title: '教育局监管', role: 'admin' }
       }
     ]
   }
