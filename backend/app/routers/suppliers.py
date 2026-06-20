@@ -5,7 +5,7 @@ from typing import List
 
 from app.database import get_db
 from app.auth import get_current_user
-from app.models import Supplier, User
+from app.models import Supplier as SupplierModel, User
 from app.schemas import SupplierCreate, Supplier
 
 router = APIRouter()
@@ -19,9 +19,9 @@ def list_suppliers(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    query = db.query(Supplier)
+    query = db.query(SupplierModel)
     if status:
-        query = query.filter(Supplier.status == status)
+        query = query.filter(SupplierModel.status == status)
     suppliers = query.offset(skip).limit(limit).all()
     return suppliers
 
@@ -32,7 +32,7 @@ def create_supplier(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    db_supplier = Supplier(**supplier.dict())
+    db_supplier = SupplierModel(**supplier.dict())
     db.add(db_supplier)
     db.commit()
     db.refresh(db_supplier)
@@ -45,7 +45,7 @@ def get_supplier(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    supplier = db.query(Supplier).filter(Supplier.id == supplier_id).first()
+    supplier = db.query(SupplierModel).filter(SupplierModel.id == supplier_id).first()
     if not supplier:
         raise HTTPException(status_code=404, detail="Supplier not found")
     return supplier
@@ -58,13 +58,13 @@ def update_supplier(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    db_supplier = db.query(Supplier).filter(Supplier.id == supplier_id).first()
+    db_supplier = db.query(SupplierModel).filter(SupplierModel.id == supplier_id).first()
     if not db_supplier:
         raise HTTPException(status_code=404, detail="Supplier not found")
-    
+
     for key, value in supplier.dict().items():
         setattr(db_supplier, key, value)
-    
+
     db.commit()
     db.refresh(db_supplier)
     return db_supplier
@@ -76,10 +76,10 @@ def delete_supplier(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    db_supplier = db.query(Supplier).filter(Supplier.id == supplier_id).first()
+    db_supplier = db.query(SupplierModel).filter(SupplierModel.id == supplier_id).first()
     if not db_supplier:
         raise HTTPException(status_code=404, detail="Supplier not found")
-    
+
     db.delete(db_supplier)
     db.commit()
     return {"message": "Supplier deleted"}

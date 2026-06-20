@@ -5,8 +5,14 @@ from typing import List
 
 from app.database import get_db
 from app.auth import get_current_user
-from app.models import StockIn, StockOut, InventoryCheck, Ingredient, User
-from app.schemas import StockInCreate, StockOutCreate, InventoryCheckCreate, StockIn, StockOut, InventoryCheck
+from app.models import (
+    StockIn as StockInModel, StockOut as StockOutModel,
+    InventoryCheck as InventoryCheckModel, Ingredient, User
+)
+from app.schemas import (
+    StockInCreate, StockOutCreate, InventoryCheckCreate,
+    StockIn, StockOut, InventoryCheck
+)
 
 router = APIRouter()
 
@@ -22,14 +28,14 @@ def stock_in(
     ingredient = db.query(Ingredient).filter(Ingredient.id == data.ingredient_id).first()
     if not ingredient:
         raise HTTPException(status_code=404, detail="Ingredient not found")
-    
+
     # 生成批次号
     import uuid
     batch_no = f"IN{uuid.uuid4().hex[:12].upper()}"
-    
+
     # 创建入库记录
     total_price = data.quantity * data.unit_price
-    record = StockIn(
+    record = StockInModel(
         batch_no=batch_no,
         ingredient_id=data.ingredient_id,
         quantity=data.quantity,
@@ -45,10 +51,10 @@ def stock_in(
         remark=data.remark
     )
     db.add(record)
-    
+
     # 更新库存
     ingredient.current_stock += data.quantity
-    
+
     db.commit()
     db.refresh(record)
     return record
@@ -64,15 +70,15 @@ def stock_out(
     ingredient = db.query(Ingredient).filter(Ingredient.id == data.ingredient_id).first()
     if not ingredient:
         raise HTTPException(status_code=404, detail="Ingredient not found")
-    
+
     if ingredient.current_stock < data.quantity:
         raise HTTPException(
             status_code=400,
             detail=f"Insufficient stock. Current: {ingredient.current_stock}, Requested: {data.quantity}"
         )
-    
+
     total_price = data.quantity * (data.unit_price or 0)
-    record = StockOut(
+    record = StockOutModel(
         ingredient_id=data.ingredient_id,
         quantity=data.quantity,
         unit_price=data.unit_price,
@@ -83,10 +89,10 @@ def stock_out(
         remark=data.remark
     )
     db.add(record)
-    
+
     # 扣减库存
     ingredient.current_stock -= data.quantity
-    
+
     db.commit()
     db.refresh(record)
     return record
@@ -102,10 +108,10 @@ def inventory_check(
     ingredient = db.query(Ingredient).filter(Ingredient.id == data.ingredient_id).first()
     if not ingredient:
         raise HTTPException(status_code=404, detail="Ingredient not found")
-    
+
     difference = data.actual_stock - data.system_stock
-    
-    record = InventoryCheck(
+
+    record = InventoryCheckModel(
         ingredient_id=data.ingredient_id,
         system_stock=data.system_stock,
         actual_stock=data.actual_stock,
@@ -114,10 +120,10 @@ def inventory_check(
         remark=data.remark
     )
     db.add(record)
-    
+
     # 校正库存
     ingredient.current_stock = data.actual_stock
-    
+
     db.commit()
     db.refresh(record)
     return record
@@ -130,7 +136,7 @@ def list_stock_in(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    records = db.query(StockIn).order_by(StockIn.created_at.desc()).offset(skip).limit(limit).all()
+    records = db.query(StockInModel).order_by(StockInModel.created_at.desc()).offset(skip).limit(limit).all()
     return records
 
 
@@ -141,5 +147,5 @@ def list_stock_out(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    records = db.query(StockOut).order_by(StockOut.created_at.desc()).offset(skip).limit(limit).all()
+    records = db.query(StockOutModel).order_by(StockOutModel.created_at.desc()).offset(skip).limit(limit).all()
     return records

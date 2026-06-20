@@ -5,7 +5,7 @@ from typing import List
 
 from app.database import get_db
 from app.auth import get_current_user
-from app.models import Ingredient, User
+from app.models import Ingredient as IngredientModel, User
 from app.schemas import IngredientCreate, Ingredient
 
 router = APIRouter()
@@ -19,9 +19,9 @@ def list_ingredients(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    query = db.query(Ingredient)
+    query = db.query(IngredientModel)
     if category_id:
-        query = query.filter(Ingredient.category_id == category_id)
+        query = query.filter(IngredientModel.category_id == category_id)
     ingredients = query.offset(skip).limit(limit).all()
     return ingredients
 
@@ -32,7 +32,7 @@ def create_ingredient(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    db_ing = Ingredient(**ingredient.dict())
+    db_ing = IngredientModel(**ingredient.dict())
     db.add(db_ing)
     db.commit()
     db.refresh(db_ing)
@@ -45,7 +45,7 @@ def get_ingredient(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    ing = db.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
+    ing = db.query(IngredientModel).filter(IngredientModel.id == ingredient_id).first()
     if not ing:
         raise HTTPException(status_code=404, detail="Ingredient not found")
     return ing
@@ -58,13 +58,13 @@ def update_ingredient(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    db_ing = db.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
+    db_ing = db.query(IngredientModel).filter(IngredientModel.id == ingredient_id).first()
     if not db_ing:
         raise HTTPException(status_code=404, detail="Ingredient not found")
-    
+
     for key, value in ingredient.dict().items():
         setattr(db_ing, key, value)
-    
+
     db.commit()
     db.refresh(db_ing)
     return db_ing
@@ -76,10 +76,10 @@ def delete_ingredient(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    db_ing = db.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
+    db_ing = db.query(IngredientModel).filter(IngredientModel.id == ingredient_id).first()
     if not db_ing:
         raise HTTPException(status_code=404, detail="Ingredient not found")
-    
+
     db.delete(db_ing)
     db.commit()
     return {"message": "Ingredient deleted"}
