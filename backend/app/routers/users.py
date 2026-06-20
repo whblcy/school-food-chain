@@ -11,6 +11,11 @@ from app.schemas import UserCreate, UserUpdate, User
 router = APIRouter()
 
 
+@router.get("/me", response_model=User)
+def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
 @router.get("/", response_model=List[User])
 def list_users(
     skip: int = 0,
