@@ -1,5 +1,5 @@
 """Pydantic schemas"""
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -34,9 +34,8 @@ class User(UserBase):
     org_id: Optional[int] = None
     last_login: Optional[datetime] = None
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserLogin(BaseModel):
@@ -70,9 +69,8 @@ class Org(OrgBase):
     id: int
     is_active: bool
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SupplierBase(BaseModel):
@@ -94,8 +92,7 @@ class Supplier(SupplierBase):
     rating: float
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CategoryBase(BaseModel):
@@ -114,8 +111,7 @@ class Category(CategoryBase):
     id: int
     is_active: bool
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class IngredientBase(BaseModel):
@@ -139,8 +135,7 @@ class Ingredient(IngredientBase):
     is_active: bool
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class StockInBase(BaseModel):
@@ -166,8 +161,7 @@ class StockIn(StockInBase):
     operator_id: int
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class StockOutBase(BaseModel):
@@ -189,8 +183,7 @@ class StockOut(StockOutBase):
     operator_id: int
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class InventoryCheckBase(BaseModel):
@@ -210,8 +203,7 @@ class InventoryCheck(InventoryCheckBase):
     operator_id: int
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PaginationParams(BaseModel):

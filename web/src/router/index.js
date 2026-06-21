@@ -84,7 +84,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  if (!to.meta.public && !authStore.token) {
+  // 优先从 localStorage 读取 token，避免 Pinia 状态未恢复
+  const token = authStore.token || localStorage.getItem('token')
+  if (!to.meta.public && !token) {
     next('/login')
   } else {
     next()
