@@ -1,12 +1,13 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: import.meta.env.DEV ? 'http://localhost:8000/api/v1' : '/api/v1',
   timeout: 10000
 })
 
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
+  console.log('[API Request]', config.url, 'token:', token ? token.substring(0, 20) + '...' : 'NULL')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }

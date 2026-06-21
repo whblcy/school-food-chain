@@ -8,7 +8,16 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
-        changeOrigin: true
+        changeOrigin: true,
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // 保留原始请求中的 Authorization 头
+            const auth = req.headers['authorization']
+            if (auth) {
+              proxyReq.setHeader('Authorization', auth)
+            }
+          })
+        }
       }
     }
   }
