@@ -2,8 +2,8 @@
 
 [![CI](https://github.com/whblcy/school-food-chain/actions/workflows/ci.yml/badge.svg)](https://github.com/whblcy/school-food-chain/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11](https://img.shields.io/badge/Python-3.11-green.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg)](https://fastapi.tiangolo.com/)
+[![Python 3.14](https://img.shields.io/badge/Python-3.14-green.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)](https://fastapi.tiangolo.com/)
 
 > 覆盖 **供应商 -> 学校 -> 教育局** 三方的食材供应链全链路管理平台，保障校园食品安全，实现从采购、配送、验收、入库、出库到财务结算的全流程数字化管理。
 
@@ -45,7 +45,7 @@
 
 | 模块 | 技术选型 |
 |------|----------|
-| **后端服务** | Python 3.11 / FastAPI / SQLAlchemy / Alembic |
+| **后端服务** | Python 3.14 / FastAPI / SQLAlchemy / Alembic |
 | **数据库** | PostgreSQL 16 / Redis 7 |
 | **任务队列** | Celery + Redis |
 | **文件存储** | MinIO |
