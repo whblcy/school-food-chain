@@ -1,0 +1,25 @@
+# 构建缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# 本地环境
+.venv/
+venv/
+env/
+
+# 本地数据
+*.db
+*.sqlite
+
+# 开发工具
+.vscode/
+.idea/
+.pytest_cache/
+.mypy_cache/
+
+# 文档
+README.md
+*.md

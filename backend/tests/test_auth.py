@@ -63,8 +63,10 @@ class TestTokenRefresh:
 
     def test_refresh_token_success(self, client, test_user, admin_refresh_token):
         """测试使用有效的 refresh token 获取新的 access token。"""
+        # 后端 /auth/refresh 使用 HTTPBearer，需通过 Authorization 头传递 refresh_token
         response = client.post(
-            f"/api/v1/auth/refresh?refresh_token={admin_refresh_token}",
+            "/api/v1/auth/refresh",
+            headers={"Authorization": f"Bearer {admin_refresh_token}"},
         )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -73,20 +75,22 @@ class TestTokenRefresh:
         assert data["token_type"] == "bearer"
 
     def test_refresh_token_invalid(self, client):
-        """测试使用无效的 refresh token，应返回 401 或 422（取决于参数解析）。"""
+        """测试使用无效的 refresh token，应返回 401 或 403。"""
         response = client.post(
-            "/api/v1/auth/refresh?refresh_token=invalid-token-here",
+            "/api/v1/auth/refresh",
+            headers={"Authorization": "Bearer invalid-token-here"},
         )
-        # FastAPI 可能因参数类型校验返回 422，或因 token 解析失败返回 401
+        # HTTPBearer 解析失败可能返回 401 或 403
         assert response.status_code in (
             status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status.HTTP_403_FORBIDDEN,
         )
 
     def test_refresh_token_with_access_token(self, client, admin_token):
         """测试使用 access token（而非 refresh token）尝试刷新，应返回 401。"""
         response = client.post(
-            f"/api/v1/auth/refresh?refresh_token={admin_token}",
+            "/api/v1/auth/refresh",
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 

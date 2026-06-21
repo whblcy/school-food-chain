@@ -1,0 +1,14 @@
+// 桌面端能力配置 — Tauri 2.x 权限系统
+// 启用 shell/notification/os 插件能力
+{
+  "$schema": "https://schema.tauri.app/acl/2",
+  "identifier": "default",
+  "description": "默认权限集合",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "shell:allow-open",
+    "notification:default",
+    "os:default"
+  ]
+}

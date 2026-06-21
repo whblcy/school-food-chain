@@ -8,7 +8,6 @@
   PUT    /api/v1/ingredients/{id}       - 更新食材
   DELETE /api/v1/ingredients/{id}       - 删除食材
 """
-import pytest
 from fastapi import status
 
 
@@ -37,7 +36,8 @@ class TestCreateIngredient:
         assert data["name"] == "胡萝卜"
         assert data["code"] == "ING-CARROT-001"
         assert data["unit"] == "千克"
-        assert data["current_stock"] == 0
+        # Pydantic v2 将 Decimal 序列化为字符串，需转换为 float 比较
+        assert float(data["current_stock"]) == 0
         assert data["is_active"] is True
         assert "id" in data
 
@@ -58,11 +58,11 @@ class TestCreateIngredient:
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["name"] == "土豆"
-        assert data["current_stock"] == 0
+        # Pydantic v2 将 Decimal 序列化为字符串，需转换为 float 比较
+        assert float(data["current_stock"]) == 0
 
     def test_create_ingredient_duplicate_code(self, client, admin_auth_headers, test_ingredient, test_category, test_org):
-        """测试创建重复 code 的食材，数据库唯一约束冲突应导致请求失败。"""
-        import sqlalchemy.exc
+        """测试创建重复 code 的食材，后端查重应返回 400 错误。"""
         payload = {
             "name": "另一白菜",
             "code": test_ingredient.code,  # 重复的 code
@@ -70,13 +70,13 @@ class TestCreateIngredient:
             "unit": "千克",
             "org_id": test_org.id,
         }
-        # IntegrityError 在 SQLite 中直接抛出，FastAPI 未全局捕获
-        with pytest.raises(sqlalchemy.exc.IntegrityError):
-            client.post(
-                "/api/v1/ingredients/",
-                json=payload,
-                headers=admin_auth_headers,
-            )
+        # 后端在创建前先查重，返回 400 Bad Request
+        response = client.post(
+            "/api/v1/ingredients/",
+            json=payload,
+            headers=admin_auth_headers,
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_create_ingredient_missing_required_fields(self, client, admin_auth_headers):
         """测试缺少必填字段创建食材，应返回 422 验证错误。"""
@@ -187,7 +187,8 @@ class TestUpdateIngredient:
         data = response.json()
         assert data["name"] == "大白菜（更新）"
         assert data["specification"] == "一级品，叶片翠绿"
-        assert data["safety_stock"] == 80.0
+        # Pydantic v2 将 Decimal 序列化为字符串，需转换为 float 比较
+        assert float(data["safety_stock"]) == 80.0
 
     def test_update_ingredient_not_found(self, client, admin_auth_headers, test_category, test_org):
         """测试更新不存在的食材 ID，应返回 404。"""

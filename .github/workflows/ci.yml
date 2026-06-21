@@ -7,9 +7,9 @@ on:
     branches: [main, develop]
 
 jobs:
-  # ---------- 后端测试 ----------
+  # ---------- 后端测试 + 安全扫描 ----------
   backend:
-    name: Backend Tests
+    name: Backend Tests & Security
     runs-on: ubuntu-latest
 
     services:
@@ -41,6 +41,8 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/school_food_test
       REDIS_URL: redis://localhost:6379/0
       SECRET_KEY: test-secret-key-for-ci-only
+      JWT_ALGORITHM: HS256
+      COOKIE_ENABLED: "false"
       DEBUG: "true"
 
     steps:
@@ -59,6 +61,7 @@ jobs:
           cd backend
           pip install --upgrade pip
           pip install -r requirements.txt
+          pip install bandit safety pip-audit
 
       - name: Run linting
         run: |
@@ -73,9 +76,34 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/school_food_test
 
-  # ---------- 前端构建 ----------
+      # ---- 安全扫描 ----
+      - name: Bandit security scan (SAST)
+        run: |
+          cd backend
+          bandit -r app/ -f json -o bandit-report.json || true
+          bandit -r app/ -ll || true
+
+      - name: Safety dependency vulnerability scan
+        run: |
+          cd backend
+          safety check --full-report || true
+
+      - name: pip-audit scan
+        run: |
+          cd backend
+          pip-audit --strict || true
+
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: backend/bandit-report.json
+          retention-days: 14
+
+  # ---------- 前端构建 + 安全扫描 ----------
   frontend:
-    name: Frontend Build
+    name: Frontend Build & Security
     runs-on: ubuntu-latest
 
     steps:
@@ -99,10 +127,21 @@ jobs:
           cd web
           npm run lint || true
 
+      - name: Type check
+        run: |
+          cd web
+          npm run typecheck
+
       - name: Build
         run: |
           cd web
           npm run build
+
+      # ---- 前端安全扫描 ----
+      - name: NPM audit
+        run: |
+          cd web
+          npm audit --audit-level=high || true
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -111,32 +150,143 @@ jobs:
           path: web/dist/
           retention-days: 7
 
-  # ---------- 桌面端检查 ----------
-  desktop:
-    name: Desktop Check
+  # ---------- 移动端构建 (uni-app) ----------
+  mobile:
+    name: Mobile Build (uni-app)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
         with:
-          python-version: "3.14"
-          cache: "pip"
-          cache-dependency-path: desktop/requirements.txt
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
 
       - name: Install dependencies
         run: |
-          cd desktop
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install PyQt6
+          cd mobile
+          npm install
 
-      - name: Verify imports
+      - name: Build H5
+        run: |
+          cd mobile
+          npm run build:h5
+
+      - name: Build WeChat Mini Program
+        run: |
+          cd mobile
+          npm run build:mp-weixin
+
+      - name: Upload H5 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-h5-dist
+          path: mobile/dist/build/h5/
+          retention-days: 7
+
+      - name: Upload WeChat MP artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-mp-weixin-dist
+          path: mobile/dist/build/mp-weixin/
+          retention-days: 7
+
+  # ---------- 桌面端构建 (Tauri) ----------
+  desktop:
+    name: Desktop Build (Tauri)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            target: aarch64-apple-darwin
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri
+
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
         run: |
           cd desktop
-          python -c "from PyQt6.QtWidgets import QApplication; print('PyQt6 OK')"
-          python -c "import sys; sys.path.insert(0, '.'); from core.api_client import ApiClient; print('ApiClient OK')"
-          python -c "import sys; sys.path.insert(0, '.'); from ui.main_window import MainWindow; print('MainWindow OK')"
+          npm install
+
+      - name: Type check
+        run: |
+          cd desktop
+          npm run typecheck
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: desktop
+          tagName: desktop-v__VERSION__
+          releaseName: "Desktop v__VERSION__"
+          releaseBody: "桌面端应用 v__VERSION__"
+          releaseDraft: true
+          prerelease: false
+
+  # ---------- 代码质量分析 ----------
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

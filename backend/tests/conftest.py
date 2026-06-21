@@ -125,7 +125,7 @@ def test_org(db_session):
 
 
 @pytest.fixture
-def test_category(db_session):
+def test_category(db_session, test_org):
     """
     创建一个测试用的食材分类。
 
@@ -138,6 +138,7 @@ def test_category(db_session):
         description="各类新鲜蔬菜",
         sort_order=1,
         is_active=True,
+        org_id=test_org.id,
     )
     db_session.add(category)
     db_session.commit()
@@ -146,7 +147,7 @@ def test_category(db_session):
 
 
 @pytest.fixture
-def test_supplier(db_session):
+def test_supplier(db_session, test_org):
     """
     创建一个测试用的供应商。
 
@@ -162,6 +163,7 @@ def test_supplier(db_session):
         address="测试市供应商路100号",
         status=SupplierStatus.ACTIVE,
         rating=4.5,
+        org_id=test_org.id,
     )
     db_session.add(supplier)
     db_session.commit()
